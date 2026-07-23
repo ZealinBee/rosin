@@ -1,26 +1,109 @@
 @import "tailwindcss";
 
+/* Brand + type — theme-independent */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+
+  --gold: #e4a22b;
+  --gold-bright: #f2b845;
+  --gold-deep: #b87e17;
+  --gold-tint: #fbf3e2;
+  --off: #e5544b;
+
+  --r-sm: 2px;
+  --r-md: 4px;
+  --r-lg: 6px;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-1: 160ms;
+  --dur-2: 240ms;
+  --dur-3: 340ms;
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-8: 3rem;
+  --sp-10: 4rem;
+  --sp-12: 6rem;
+  --sp-16: 8rem;
 }
 
+/* Dark — the instrument panel (default) */
+:root,
+[data-theme="dark"] {
+  --bg: #0d0d0f;
+  --surface: #16161a;
+  --raised: #1f1f24;
+  --border: #2c2c33;
+  --border-strong: #3a3a42;
+  --text-hi: #f4f4f5;
+  --text-mid: #b7b7be;
+  --text-lo: #78787f;
+  --intune: #3fd988;
+  --gauge-track: #26262c;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* Light — cool & clean, never cream */
+[data-theme="light"] {
+  --bg: #f6f6f7;
+  --surface: #ffffff;
+  --raised: #ffffff;
+  --border: #e4e4e8;
+  --border-strong: #d2d2d8;
+  --text-hi: #17171a;
+  --text-mid: #4e4e56;
+  --text-lo: #83838c;
+  --intune: #1fa85f;
+  --gauge-track: #eaeaee;
+  --shadow: 0 1px 2px rgba(20, 20, 25, 0.06), 0 8px 24px rgba(20, 20, 25, 0.06);
+}
+
+/* Expose tokens to Tailwind utilities */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text-hi: var(--text-hi);
+  --color-text-mid: var(--text-mid);
+  --color-text-lo: var(--text-lo);
+  --color-gold: var(--gold);
+  --color-gold-bright: var(--gold-bright);
+  --color-gold-deep: var(--gold-deep);
+  --color-intune: var(--intune);
+  --color-off: var(--off);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text-hi);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+  transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+}
+
+::selection {
+  background: var(--gold);
+  color: #17130a;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }
