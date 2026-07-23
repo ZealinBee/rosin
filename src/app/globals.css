@@ -10,6 +10,12 @@
   --gold-deep: #b87e17;
   --gold-tint: #fbf3e2;
   --off: #e5544b;
+  /* Pitch direction — cool for flat (under), warm for sharp (over). The
+     "soft" variants are desaturated, for slightly-off notes (within 20¢). */
+  --flat: #4f8ff5;
+  --flat-soft: #8aa9d8;
+  --sharp: #e5544b;
+  --sharp-soft: #d89189;
 
   --r-sm: 2px;
   --r-md: 4px;
@@ -77,6 +83,10 @@
   --color-gold-deep: var(--gold-deep);
   --color-intune: var(--intune);
   --color-off: var(--off);
+  --color-flat: var(--flat);
+  --color-flat-soft: var(--flat-soft);
+  --color-sharp: var(--sharp);
+  --color-sharp-soft: var(--sharp-soft);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
 }

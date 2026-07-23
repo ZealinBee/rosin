@@ -1,5 +1,18 @@
-import type { RecordingAnalysis, SummaryEntry } from "@/lib/pitch";
+import {
+  toneFromCents,
+  type RecordingAnalysis,
+  type SummaryEntry,
+  type Tone,
+} from "@/lib/pitch";
 import SheetMusic from "./sheet-music";
+
+const TONE_COLOR: Record<Tone, string> = {
+  "in-tune": "var(--intune)",
+  "slight-flat": "var(--flat-soft)",
+  flat: "var(--flat)",
+  "slight-sharp": "var(--sharp-soft)",
+  sharp: "var(--sharp)",
+};
 
 export default function NoteSheet({
   analysis,
@@ -35,6 +48,7 @@ export default function NoteSheet({
               entries={mostFlat}
               glyph="♭"
               arrow="↓"
+              color="var(--flat)"
               emptyText="Nothing consistently flat. Nice."
             />
             <SummaryColumn
@@ -43,6 +57,7 @@ export default function NoteSheet({
               entries={mostSharp}
               glyph="♯"
               arrow="↑"
+              color="var(--sharp)"
               emptyText="Nothing consistently sharp. Nice."
             />
           </div>
@@ -58,6 +73,7 @@ function SummaryColumn({
   entries,
   glyph,
   arrow,
+  color,
   emptyText,
 }: {
   title: string;
@@ -65,13 +81,14 @@ function SummaryColumn({
   entries: SummaryEntry[];
   glyph: string;
   arrow: string;
+  color: string;
   emptyText: string;
 }) {
   return (
     <div className="flex flex-col gap-[var(--sp-3)]">
       <div className="flex flex-col gap-[2px]">
         <h3 className="flex items-center gap-[var(--sp-2)] text-[1.125rem] font-semibold tracking-[-0.02em]">
-          <span style={{ color: "var(--off)" }}>{glyph}</span>
+          <span style={{ color }}>{glyph}</span>
           {title}
         </h3>
         <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-lo">
@@ -93,7 +110,7 @@ function SummaryColumn({
               </span>
               <span className="flex items-center gap-[var(--sp-3)] font-mono text-sm">
                 <span className="text-text-lo">×{e.count}</span>
-                <span style={{ color: "var(--off)" }}>
+                <span style={{ color: TONE_COLOR[toneFromCents(e.avgCents)] }}>
                   {arrow} {Math.abs(e.avgCents)}¢
                 </span>
               </span>

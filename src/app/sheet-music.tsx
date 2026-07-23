@@ -9,7 +9,7 @@ import {
   StaveNote,
   Voice,
 } from "vexflow";
-import type { PitchState, PlayedNote } from "@/lib/pitch";
+import { toneFromCents, type PlayedNote, type Tone } from "@/lib/pitch";
 
 /** Map a played note to a VexFlow key like "f#/4". */
 function vexKey(note: PlayedNote): { key: string; sharp: boolean } {
@@ -44,10 +44,12 @@ export default function SheetMusic({ notes }: { notes: PlayedNote[] }) {
       const css = getComputedStyle(document.documentElement);
       const cvar = (n: string) => css.getPropertyValue(n).trim() || "#000";
       const ink = cvar("--text-hi");
-      const stateColor: Record<PitchState, string> = {
+      const toneColor: Record<Tone, string> = {
         "in-tune": cvar("--intune"),
-        near: cvar("--gold"),
-        off: cvar("--off"),
+        "slight-flat": cvar("--flat-soft"),
+        flat: cvar("--flat"),
+        "slight-sharp": cvar("--sharp-soft"),
+        sharp: cvar("--sharp"),
       };
 
       const width = Math.max(320, el.clientWidth);
@@ -78,7 +80,7 @@ export default function SheetMusic({ notes }: { notes: PlayedNote[] }) {
           const { key, sharp } = vexKey(n);
           const sn = new StaveNote({ keys: [key], duration: "q" });
           if (sharp) sn.addModifier(new Accidental("#"), 0);
-          const col = stateColor[n.state];
+          const col = toneColor[toneFromCents(n.cents)];
           sn.setStyle({ fillStyle: col, strokeStyle: col });
           return sn;
         });
@@ -104,7 +106,7 @@ export default function SheetMusic({ notes }: { notes: PlayedNote[] }) {
           const label = centsText(n.cents);
           const x = staveNotes[i].getAbsoluteX();
           const w = context.measureText(label).width;
-          context.setFillStyle(stateColor[n.state]);
+          context.setFillStyle(toneColor[toneFromCents(n.cents)]);
           context.fillText(label, x - w / 2 + 5, y + LINE_HEIGHT - 26);
         });
         context.restore();

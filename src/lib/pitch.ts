@@ -39,6 +39,27 @@ export interface PitchReading {
   state: PitchState;
 }
 
+/**
+ * Pitch direction + degree, used to color notes: green in tune, then a soft
+ * and a strong shade for each of flat (under) and sharp (over).
+ */
+export type Tone =
+  | "in-tune"
+  | "slight-flat"
+  | "flat"
+  | "slight-sharp"
+  | "sharp";
+
+/**
+ * Classify by direction and degree: in tune (±5¢), slightly off (within 20¢),
+ * or clearly off (beyond 20¢).
+ */
+export function toneFromCents(cents: number): Tone {
+  if (cents >= -5 && cents <= 5) return "in-tune";
+  if (cents < 0) return cents < -20 ? "flat" : "slight-flat";
+  return cents > 20 ? "sharp" : "slight-sharp";
+}
+
 /** Map cents-off-pitch to a semantic state (see design.md). */
 export function stateFromCents(cents: number): PitchState {
   const abs = Math.abs(cents);
@@ -89,9 +110,9 @@ export interface PlayedNote {
   samples: number;
 }
 
-/** An entry in the flat/sharp leaderboard, aggregated by note name. */
+/** An entry in the flat/sharp leaderboard, aggregated by note + octave. */
 export interface SummaryEntry {
-  note: string; // pitch class, e.g. "F♯"
+  note: string; // note with octave, e.g. "F♯5", "G4"
   count: number; // how many times this note was played off in that direction
   avgCents: number; // average deviation across those plays
 }
@@ -160,8 +181,9 @@ export function segmentNotes(
 }
 
 /**
- * Rank note names by how often they were played too flat or too sharp
- * (beyond the ±5-cent in-tune band), most frequent first.
+ * Rank notes by how often they were played too flat or too sharp (beyond the
+ * ±5-cent in-tune band), most frequent first. Notes are distinguished by
+ * octave, so G3 and G4 are ranked separately.
  */
 export function summarize(notes: PlayedNote[]): {
   mostFlat: SummaryEntry[];
@@ -171,12 +193,13 @@ export function summarize(notes: PlayedNote[]): {
   const sharp = new Map<string, { count: number; total: number }>();
 
   for (const n of notes) {
+    const key = `${n.note}${n.octave}`; // e.g. "G4", "F♯5"
     if (n.cents < -5) {
-      const e = flat.get(n.note) ?? { count: 0, total: 0 };
-      flat.set(n.note, { count: e.count + 1, total: e.total + n.cents });
+      const e = flat.get(key) ?? { count: 0, total: 0 };
+      flat.set(key, { count: e.count + 1, total: e.total + n.cents });
     } else if (n.cents > 5) {
-      const e = sharp.get(n.note) ?? { count: 0, total: 0 };
-      sharp.set(n.note, { count: e.count + 1, total: e.total + n.cents });
+      const e = sharp.get(key) ?? { count: 0, total: 0 };
+      sharp.set(key, { count: e.count + 1, total: e.total + n.cents });
     }
   }
 

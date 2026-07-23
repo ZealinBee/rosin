@@ -5,25 +5,22 @@ import {
   analyseFrequency,
   analyseRecording,
   detectPitch,
+  toneFromCents,
   type PitchReading,
-  type PitchState,
   type RawFrame,
   type RecordingAnalysis,
+  type Tone,
 } from "@/lib/pitch";
 import NoteSheet from "./note-sheet";
 
 type Status = "idle" | "listening" | "denied" | "unsupported";
 
-const STATE_COLOR: Record<PitchState, string> = {
+const TONE_COLOR: Record<Tone, string> = {
   "in-tune": "var(--intune)",
-  near: "var(--gold)",
-  off: "var(--off)",
-};
-
-const STATE_LABEL: Record<PitchState, string> = {
-  "in-tune": "In tune",
-  near: "Near",
-  off: "Off",
+  "slight-flat": "var(--flat-soft)",
+  flat: "var(--flat)",
+  "slight-sharp": "var(--sharp-soft)",
+  sharp: "var(--sharp)",
 };
 
 // Gauge geometry.
@@ -170,8 +167,8 @@ export default function Tuner() {
   }, []);
 
   const active = status === "listening" && !silent && reading !== null;
-  const state = active ? reading!.state : null;
-  const color = state ? STATE_COLOR[state] : "var(--text-lo)";
+  const tone = active ? toneFromCents(reading!.cents) : null;
+  const color = tone ? TONE_COLOR[tone] : "var(--text-lo)";
   const cents = active ? Math.max(-50, Math.min(50, reading!.cents)) : 0;
   const needleDeg = (cents / 50) * MAX_DEG;
 
@@ -368,13 +365,14 @@ function StatePill({
     );
   }
 
-  const { state, cents } = reading;
-  const color = STATE_COLOR[state];
+  const { cents } = reading;
+  const tone = toneFromCents(cents);
+  const color = TONE_COLOR[tone];
   const sign = cents > 0 ? "+" : "";
-  const direction =
-    state === "in-tune" ? "" : cents > 0 ? " Sharp" : " Flat";
   const label =
-    state === "in-tune" ? STATE_LABEL[state] : `${sign}${cents}¢${direction}`;
+    tone === "in-tune"
+      ? "In tune"
+      : `${sign}${cents}¢ ${cents > 0 ? "Sharp" : "Flat"}`;
 
   return (
     <div
